@@ -1,0 +1,26 @@
+# Description: Persistent Volume Claim for Plex - unique to the media namespace
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: k3s-data
+  namespace: media
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: k3s-config
+  namespace: media
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

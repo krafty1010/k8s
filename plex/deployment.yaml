@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+      - name: plex
+        image: lscr.io/linuxserver/plex:latest
+        ports:
+        - containerPort: 32400
+          name: http
+        volumeMounts:
+        - mountPath: /plex/config
+          name: plex-config
+        - mountPath: /plex/data
+          name: plex-data
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        env:
+        - name: PLEX_CLAIM
+          value: foo-bar # Optional: Get it from https://www.plex.tv/claim
+      volumes:
+      - name: plex-data
+        persistentVolumeClaim:
+          claimName: k3s-data
+      - name: plex-config
+        persistentVolumeClaim:
+          claimName: k3s-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+  namespace: media
+spec:
+  selector:
+    app: plex
+  ports:
+  - protocol: TCP
+    port: 32400
+    targetPort: 32400
+  type: LoadBalancer

@@ -1,0 +1,40 @@
+# Create a PersistentVolume for the NFS server - shared across namespaces
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: media
+  name: k3s-data
+spec:
+  capacity:
+    storage: 500Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /tmp/mnt/sda1/k3s-data
+    server: 10.10.0.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: media
+  name: k3s-config
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /tmp/mnt/sda1/k3s-config
+    server: 10.10.0.31    
