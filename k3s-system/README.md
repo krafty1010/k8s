@@ -1,4 +1,4 @@
-
+# Setup rasbperry OS host for K3S
 
 
 udo apt update
@@ -7,15 +7,14 @@ sudo nano /etc/dphys-swapfile
 
 ### Setup cgroups
 
-appending to existig line (do not create a new line!)
+appending to existing line (do not create a new line!)
 
 ```
 $ cat /boot/firmware/cmdline.txt 
 console=serial0,115200 console=tty1 root=PARTUUID=c4adc3b5-02 rootfstype=ext4 fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory
 ```
 
-
-Verify
+#### Verify
 ```
 $ cat /proc/cgroups
 #subsys_name	hierarchy	num_cgroups	enabled
@@ -37,7 +36,6 @@ pids	0	95	1
 $ sudo curl -sfL https://get.k3s.io | sh -
 $ sudo systemctl status k3s
 ```
-
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
 
 kubectl apply -f metallb.yaml
@@ -45,11 +43,11 @@ kubectl apply -f metallb.yaml
 kubectl create namespace test-metallb
 kubectl create deployment nginx --image=nginx -n test-metallb
 kubectl expose deployment nginx --type=LoadBalancer --name=nginx --port=80 --protocol=TCP -n test-metallb
+```
 
 test http://<EXTERNAL-IP>
 
-
-ref
+### ref
 
 https://maxdon.tech/posts/k3s-raspberry-pi/
 

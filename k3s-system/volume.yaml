@@ -15,6 +15,9 @@ spec:
   mountOptions:
     - hard
     - nfsvers=4.1
+    - proto=tcp
+    - rsize=32768
+    - wsize=32768
   nfs:
     path: /tmp/mnt/sda1/k3s-data
     server: 10.10.0.31
@@ -35,6 +38,9 @@ spec:
   mountOptions:
     - hard
     - nfsvers=4.1
+    - proto=tcp
+    - rsize=32768
+    - wsize=32768
   nfs:
     path: /tmp/mnt/sda1/k3s-config
     server: 10.10.0.31    

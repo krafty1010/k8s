@@ -4,6 +4,7 @@ metadata:
   name: plex
   namespace: media
 spec:
+  revisionHistoryLimit: 0  # Do not keep previous ReplicaSet
   replicas: 1
   selector:
     matchLabels:
@@ -13,17 +14,38 @@ spec:
       labels:
         app: plex
     spec:
+      hostNetwork: true  # Enable host networking for UDP
+      dnsPolicy: ClusterFirstWithHostNet  # Ensure DNS works correctly
       containers:
       - name: plex
         image: lscr.io/linuxserver/plex:latest
         ports:
         - containerPort: 32400
-          name: http
+          name: plex
+        - containerPort: 8324
+          name: plex-roku
+        - containerPort: 32469
+          name: plex-dlna
+        - containerPort: 1900
+          name: plex-upnp
+          protocol: UDP
+        - containerPort: 32410
+          name: plex-gdm-1
+          protocol: UDP
+        - containerPort: 32412
+          name: plex-gdm-2
+          protocol: UDP
+        - containerPort: 32413
+          name: plex-gdm-3
+          protocol: UDP
+        - containerPort: 32414
+          name: plex-gdm-4
+          protocol: UDP
         volumeMounts:
-        - mountPath: /plex/config
-          name: plex-config
-        - mountPath: /plex/data
-          name: plex-data
+          - mountPath: /plex/data
+            name: plex-data
+          - mountPath: /config
+            name: plex-config                                  
         resources:
           limits:
             memory: "512Mi"
@@ -33,25 +55,15 @@ spec:
             cpu: "250m"
         env:
         - name: PLEX_CLAIM
-          value: foo-bar # Optional: Get it from https://www.plex.tv/claim
+          value: claim-Ycmj3zFJZCHWqPm_enCV # Optional: Get it from https://www.plex.tv/claim
+        - name: ADVERTISE_IP
+          value: 'http://10.10.0.31:32400/,https://plex.local'          
       volumes:
       - name: plex-data
-        persistentVolumeClaim:
-          claimName: k3s-data
+        nfs:
+          server: 10.10.0.31
+          path: /mnt/ext1/k3s-data
       - name: plex-config
-        persistentVolumeClaim:
-          claimName: k3s-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: plex
-  namespace: media
-spec:
-  selector:
-    app: plex
-  ports:
-  - protocol: TCP
-    port: 32400
-    targetPort: 32400
-  type: LoadBalancer
+        nfs:
+          server: 10.10.0.31
+          path: /mnt/ext1/k3s-config

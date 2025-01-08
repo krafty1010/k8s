@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  namespace: media
+spec:
+  selector:
+    matchLabels:
+      app: transmission
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: transmission  
+    spec:
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+        searches:
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "5"
+      hostNetwork: false
+      containers:
+        - name: transmission
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+            privileged: true
+          image: "haugene/transmission-openvpn:latest"
+          envFrom:
+            - configMapRef:
+                name: transmission-config
+                optional: false     
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"          
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-net-tun
+              readOnly: true
+            - mountPath: /data
+              name: data
+            - mountPath: "/etc/openvpn/custom/default.ovpn"              
+              name: config
+              subPath: "openvpn.conf"                                   
+          ports:
+            - name: http
+              containerPort: 9091
+              protocol: TCP              
+      volumes:
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+        - name: k3s-data
+          persistentVolumeClaim:
+            claimName: k3s-data
+        - name: localtime
+          hostPath:
+              path: /etc/localtime
+              type: ""
+        - name: config
+          secret:
+            secretName: openvpn
+        - name: data
+          nfs:
+            server: 10.10.0.31
+            path: /mnt/ext1/k3s-data/transmission
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-service
+spec:
+  selector:
+    app: transmission
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9091
+  type: LoadBalancer
