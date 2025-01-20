@@ -52,3 +52,17 @@ test http://<EXTERNAL-IP>
 https://maxdon.tech/posts/k3s-raspberry-pi/
 
 
+### Setup NFS
+
+```
+sudo chmod 777 ./k3s-data/ -R
+sudo chown 1000:1000 ./ext1/ -R
+````
+
+#### exports
+````
+/mnt/ext1/dir  10.x.x.x/26(rw,no_root_squash,async,no_subtree_check,insecure)
+```
+
+#### 
+````

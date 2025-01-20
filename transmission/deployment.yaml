@@ -51,11 +51,10 @@ spec:
             - mountPath: /dev/net/tun
               name: dev-net-tun
               readOnly: true
+            - mountPath: /config
+              name: config                
             - mountPath: /data
-              name: data
-            - mountPath: "/etc/openvpn/custom/default.ovpn"              
-              name: config
-              subPath: "openvpn.conf"                                   
+              name: data                                  
           ports:
             - name: http
               containerPort: 9091
@@ -65,20 +64,18 @@ spec:
           hostPath:
             path: /dev/net/tun
             type: CharDevice
-        - name: k3s-data
-          persistentVolumeClaim:
-            claimName: k3s-data
         - name: localtime
           hostPath:
               path: /etc/localtime
               type: ""
-        - name: config
-          secret:
-            secretName: openvpn
         - name: data
           nfs:
             server: 10.10.0.31
             path: /mnt/ext1/k3s-data/transmission
+        - name: config
+          nfs:
+            server: 10.10.0.31
+            path: /mnt/ext1/k3s-config/
 ---
 apiVersion: v1
 kind: Service
