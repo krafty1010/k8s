@@ -55,7 +55,7 @@ spec:
             cpu: "250m"
         env:
         - name: PLEX_CLAIM
-          value: claim-Ycmj3zFJZCHWqPm_enCV # Optional: Get it from https://www.plex.tv/claim
+          value: foo # Optional: Get it from https://www.plex.tv/claim
         - name: ADVERTISE_IP
           value: 'http://10.10.0.31:32400/,https://plex.local'          
       volumes:
