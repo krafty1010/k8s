@@ -66,3 +66,35 @@ sudo chown 1000:1000 ./ext1/ -R
 
 #### 
 ````
+
+
+### Setup systemctl restart
+
+Keep things fresh
+
+sudo nano /etc/systemd/system/stop-services.service
+
+```
+[Unit]
+Description=Stop K3s and NFS services
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/stop_services.sh
+```
+
+sudo nano /etc/systemd/system/stop-services.timer
+
+```
+[Unit]
+
+Description=Run shutdown Script at 03:00 AM
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+```

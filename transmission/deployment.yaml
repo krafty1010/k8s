@@ -13,13 +13,13 @@ spec:
   template:
     metadata:
       labels:
-        app: transmission  
+        app: transmission
     spec:
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
-        - 8.8.8.8
-        - 8.8.4.4
+          - 8.8.8.8
+          - 8.8.4.4
         searches:
           - svc.cluster.local
           - cluster.local
@@ -39,26 +39,47 @@ spec:
           envFrom:
             - configMapRef:
                 name: transmission-config
-                optional: false     
+                optional: false
           resources:
             limits:
               memory: "256Mi"
               cpu: "500m"
             requests:
               memory: "128Mi"
-              cpu: "250m"          
+              cpu: "250m"
           volumeMounts:
             - mountPath: /dev/net/tun
               name: dev-net-tun
               readOnly: true
             - mountPath: /config
-              name: config                
+              name: config
             - mountPath: /data
-              name: data                                  
+              name: data
           ports:
             - name: http
               containerPort: 9091
-              protocol: TCP              
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /transmission/
+              port: 9091
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 2
+          readinessProbe:
+            httpGet:
+              path: /transmission/
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /transmission/
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
       volumes:
         - name: dev-net-tun
           hostPath:
@@ -66,8 +87,8 @@ spec:
             type: CharDevice
         - name: localtime
           hostPath:
-              path: /etc/localtime
-              type: ""
+            path: /etc/localtime
+            type: ""
         - name: data
           nfs:
             server: 10.10.0.31

@@ -12,7 +12,7 @@ data:
   PIA_PROTOCOL: TCP
   PIA_COUNTRY: "Switzerland"
   PIA_CATEGORY: "P2P"
-  LOG_TO_STDOUT: "True"
+  LOG_TO_STDOUT: "true"
   PUID: "1000"
   PGID: "1000"
   TRANSMISSION_UMASK: "002"
