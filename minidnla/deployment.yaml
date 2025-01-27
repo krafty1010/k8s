@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minidlna
+  namespace: media
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minidlna
+  template:
+    metadata:
+      labels:
+        app: minidlna
+    spec:
+      hostNetwork: true  # Enable host networking
+      dnsPolicy: ClusterFirstWithHostNet  # Required when using hostNetwork
+      containers:
+      - name: minidlna
+        image: vladgh/minidlna:latest
+        ports:
+        - containerPort: 8200
+          name: http
+        - containerPort: 1900
+          name: ssdp
+          protocol: UDP
+        startupProbe:
+          tcpSocket:
+            port: 8200
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 2
+        readinessProbe:
+          tcpSocket:
+            port: 8200
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8200
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 3          
+        volumeMounts:
+        - mountPath: /var/lib/minidlna
+          name: data
+        env:
+        - name: MINIDLNA_MEDIA_DIR_1
+          value: "V,/var/lib/minidlna/transmission/downloads"
+        - name: MINIDLNA_MEDIA_DIR_2
+          value: "A,/var/lib/minidlna/music"          
+        - name: MINIDLNA_FRIENDLY_NAME
+          value: "miniDLNA"
+        resources:
+          requests:
+            memory: "128Mi"    # Minimum memory requested
+            cpu: "100m"        # Minimum CPU requested
+          limits:
+            memory: "256Mi"    # Maximum memory allowed
+            cpu: "500m"        # Maximum CPU allowed
+      volumes:
+        - name: localtime
+          hostPath:
+              path: /etc/localtime
+              type: ""
+        - name: data
+          nfs:
+            server: 10.10.0.31
+            path: /mnt/ext1/k3s-data/

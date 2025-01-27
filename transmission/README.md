@@ -16,7 +16,6 @@ sudo chmod 600 /dev/net/tun
 
 Workaround for pod hangs at 'Applying permissions to transmission directories'
 
-Check NFS export settings are optimised for perf
+Check NFS export settings are optimised for async
 
 ## to-do
-Use secret for credentials

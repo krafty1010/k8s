@@ -36,10 +36,22 @@ spec:
                 - SYS_MODULE
             privileged: true
           image: "haugene/transmission-openvpn:latest"
+          imagePullPolicy: "Always"
           envFrom:
             - configMapRef:
                 name: transmission-config
                 optional: false
+          env:
+            - name: OPENVPN_PASSWORD           # Inject individual key from Secret
+              valueFrom:
+                secretKeyRef:
+                  name: openvpn
+                  key: password
+            - name: OPENVPN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: openvpn
+                  key: username                
           resources:
             limits:
               memory: "256Mi"
