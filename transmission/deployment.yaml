@@ -30,13 +30,15 @@ spec:
       containers:
         - name: transmission
           securityContext:
+            seccompProfile:
+              type: "Unconfined"
             capabilities:
               add:
                 - NET_ADMIN
                 - SYS_MODULE
             privileged: true
           image: "haugene/transmission-openvpn:latest"
-          imagePullPolicy: "Always"
+          imagePullPolicy: "IfNotPresent"
           envFrom:
             - configMapRef:
                 name: transmission-config
@@ -75,21 +77,21 @@ spec:
             httpGet:
               path: /transmission/
               port: 9091
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 2
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /transmission/
               port: 9091
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 30
+            periodSeconds: 10
             failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /transmission/
               port: 9091
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 3
       volumes:

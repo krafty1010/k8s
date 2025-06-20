@@ -56,11 +56,11 @@ spec:
           value: "miniDLNA"
         resources:
           requests:
-            memory: "128Mi"    # Minimum memory requested
-            cpu: "100m"        # Minimum CPU requested
+            memory: "32Mi"    # Minimum memory requested
+            cpu: "10m"        # Minimum CPU requested
           limits:
-            memory: "256Mi"    # Maximum memory allowed
-            cpu: "500m"        # Maximum CPU allowed
+            memory: "128Mi"    # Maximum memory allowed
+            cpu: "100m"        # Maximum CPU allowed
       volumes:
         - name: localtime
           hostPath:
