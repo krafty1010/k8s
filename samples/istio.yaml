@@ -1,0 +1,108 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: client-dev-project
+  name: user-kafka-ui-deployment
+  labels:
+    app: user-kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-kafka-ui
+  template:
+    metadata:
+      labels:
+        app: user-kafka-ui
+    spec:
+      imagePullSecrets:
+        - name: data-core-approved-docker-registry
+      securityContext:
+        runAsUser: 1001
+      containers:
+      - name: kafka-ui
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: registry.gitlab.data-ops.ice.topleveldomain/approved-containers/client/dev/project/provectuslabs/kafka-ui:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DYNAMIC_CONFIG_ENABLED
+          value: "true"
+        volumeMounts:
+            - mountPath: /etc/kafkaui/
+              name: user-kafka-ui-data
+      volumes:
+      - name: user-kafka-ui-data
+        emptyDir:
+          sizeLimit: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: client-dev-project
+  name: user-kafka-ui
+spec:
+  selector:
+    app: user-kafka-ui
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: 'user-kafka-ui-virtual-service'
+spec:
+  hosts:
+  - client-dev-project-user-kafka-ui.data.ice.topleveldomain
+  gateways:
+  - 'user-kafka-ui-gateway'
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: 'user-kafka-ui.client-dev-project.svc.cluster.local'
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: 'user-kafka-ui-gateway'
+spec:
+  selector:
+    istio: 'data-prod-istio-ingress'
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      credentialName: project-user-tls
+      mode: SIMPLE
+    hosts:
+    - client-dev-project-user-kafka-ui.data.ice.topleveldomain
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: project-user-tls
+  namespace: istio-ingress
+spec:
+  commonName: client-dev-project-user-kafka-ui.data.ice.topleveldomain
+  dnsNames:
+    - dclient-dev-project-user-kafka-ui.data.ice.topleveldomain
+  duration: 2160h0m0s
+  issuerRef:
+    group: awspca.cert-manager.io
+    kind: AWSPCAClusterIssuer
+    name: data-dev-cluster-issuer-root-ca
+  renewBefore: 360h0m0s
+  secretName: project-user-tls
+  usages:
+    - server auth
+    - client auth
