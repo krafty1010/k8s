@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: transmission
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:krafty1010/k8s.git
+    path: transmission/
+    targetRevision: main
+  destination:
+    namespace: media
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
