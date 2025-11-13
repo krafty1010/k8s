@@ -34,7 +34,7 @@ data:
   TRANSMISSION_MAX_PEERS_GLOBAL: "400"
   TRANSMISSION_MAX_PEERS_PER_TORRENT: "200"
   TRANSMISSION_DEBUG: "true"
-  TRANSMISSION_BLOCKLIST_ENABLED": true,
-  TRANSMISSION_BLOCKLIST_URL": "https://raw.githubusercontent.com/Naunter/BT_BlockLists/master/bt_blocklists.gz"
+  TRANSMISSION_BLOCKLIST_ENABLED: true,
+  TRANSMISSION_BLOCKLIST_URL: "https://raw.githubusercontent.com/Naunter/BT_BlockLists/master/bt_blocklists.gz"
   WEBPROXY_ENABLED: "false"
   HEALTH_CHECK_HOST: "google.co.uk"
