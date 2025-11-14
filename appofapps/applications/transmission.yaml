@@ -6,7 +6,7 @@ spec:
   project: default
   source:
     repoURL: git@github.com:krafty1010/k8s.git
-    path: transmission/
+    path: transmission
     targetRevision: main
   destination:
     namespace: media
