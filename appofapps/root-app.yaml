@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: git@github.com:krafty1010/k8s.git
-    path: applications
+    path: appofapps/applications
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc  

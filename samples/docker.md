@@ -1,0 +1,1 @@
+docker run -it --name ubi10-container redhat/ubi10-micro /bin/bash 
